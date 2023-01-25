@@ -7,13 +7,13 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Assertions.Comparers;
 using Random = System.Random;
-using Vector2 = RVO.Vector2;
+using Lockstep.Math;
 
 public class GameMainManager : SingletonBehaviour<GameMainManager>
 {
     public GameObject agentPrefab;
 
-    [HideInInspector] public Vector2 mousePosition;
+    [HideInInspector] public LFloat2 mousePosition;
 
     private Plane m_hPlane = new Plane(Vector3.up, Vector3.zero);
     private Dictionary<int, GameAgent> m_agentMap = new Dictionary<int, GameAgent>();
@@ -21,8 +21,8 @@ public class GameMainManager : SingletonBehaviour<GameMainManager>
     // Use this for initialization
     void Start()
     {
-        Simulator.Instance.setTimeStep(0.25f);
-        Simulator.Instance.setAgentDefaults(15.0f, 10, 5.0f, 5.0f, 2.0f, 2.0f, new Vector2(0.0f, 0.0f));
+        Simulator.Instance.setTimeStep(new LFloat(true, 250));
+        Simulator.Instance.setAgentDefaults(new LFloat(15), 10, new LFloat(5), new LFloat(5), new LFloat(2), new LFloat(2), LFloat2.zero);
 
         // add in awake
         Simulator.Instance.processObstacles();
@@ -36,14 +36,12 @@ public class GameMainManager : SingletonBehaviour<GameMainManager>
         if (m_hPlane.Raycast(mouseRay, out rayDistance))
             position = mouseRay.GetPoint(rayDistance);
 
-        mousePosition.x_ = position.x;
-        mousePosition.y_ = position.z;
+        mousePosition = new LFloat2(true, position.x, position.z);
     }
 
     void DeleteAgent()
     {
-        float rangeSq = float.MaxValue;
-        int agentNo = Simulator.Instance.queryNearAgent(mousePosition, 1.5f);
+        int agentNo = Simulator.Instance.queryNearAgent(mousePosition, new LFloat(true, 1500));
         if (agentNo == -1 || !m_agentMap.ContainsKey(agentNo))
             return;
 
@@ -57,7 +55,7 @@ public class GameMainManager : SingletonBehaviour<GameMainManager>
         int sid = Simulator.Instance.addAgent(mousePosition);
         if (sid >= 0)
         {
-            GameObject go = LeanPool.Spawn(agentPrefab, new Vector3(mousePosition.x(), 0, mousePosition.y()), Quaternion.identity);
+            GameObject go = LeanPool.Spawn(agentPrefab, new Vector3(mousePosition.x.ToFloat(), 0, mousePosition.y.ToFloat()), Quaternion.identity);
             GameAgent ga = go.GetComponent<GameAgent>();
             Assert.IsNotNull(ga);
             ga.sid = sid;

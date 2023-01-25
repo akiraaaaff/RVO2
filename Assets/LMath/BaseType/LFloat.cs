@@ -16,10 +16,7 @@ namespace Lockstep.Math
         public static readonly LFloat one = new LFloat(true, LFloat.P1000);
         public static readonly LFloat negOne = new LFloat(true, -LFloat.P1000);
         public static readonly LFloat half = new LFloat(true, LFloat.P1000 / 2);
-        public static readonly LFloat FLT_MAX = new LFloat(true, int.MaxValue);
-        public static readonly LFloat FLT_MIN = new LFloat(true, int.MinValue);
         public static readonly LFloat EPSILON = new LFloat(true, 1);
-        public static readonly LFloat INTERVAL_EPSI_LON = new LFloat(true, 1);
 
         public static readonly LFloat MaxValue = new LFloat(true, int.MaxValue);
         public static readonly LFloat MinValue = new LFloat(true, int.MinValue);

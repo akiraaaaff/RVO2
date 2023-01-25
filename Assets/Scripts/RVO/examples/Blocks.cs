@@ -42,38 +42,40 @@
 
 using System;
 using System.Collections.Generic;
+using Lockstep.Math;
+using Random = Unity.Mathematics.Random;
 
 namespace RVO
 {
     class Blocks
     {
         /* Store the goals of the agents. */
-        IList<Vector2> goals;
+        IList<LFloat2> goals;
 
         /** Random number generator. */
         Random random;
 
         Blocks()
         {
-            goals = new List<Vector2>();
+            goals = new List<LFloat2>();
 
-            #if RVO_SEED_RANDOM_NUMBER_GENERATOR
+#if RVO_SEED_RANDOM_NUMBER_GENERATOR
             random = new Random();
-            #else
+#else
             random = new Random(0);
-            #endif
+#endif
         }
 
         void setupScenario()
         {
             /* Specify the global time step of the simulation. */
-            Simulator.Instance.setTimeStep(0.25f);
+            Simulator.Instance.setTimeStep(new LFloat(true,250));
 
             /*
              * Specify the default parameters for agents that are subsequently
              * added.
              */
-            Simulator.Instance.setAgentDefaults(15.0f, 10, 5.0f, 5.0f, 2.0f, 2.0f, new Vector2(0.0f, 0.0f));
+            Simulator.Instance.setAgentDefaults(new LFloat(15), 10, new LFloat(5), new LFloat(5), new LFloat(2), new LFloat(2), LFloat2.zero);
 
             /*
              * Add agents, specifying their start position, and store their
@@ -83,17 +85,17 @@ namespace RVO
             {
                 for (int j = 0; j < 5; ++j)
                 {
-                    Simulator.Instance.addAgent(new Vector2(55.0f + i * 10.0f, 55.0f + j * 10.0f));
-                    goals.Add(new Vector2(-75.0f, -75.0f));
+                    Simulator.Instance.addAgent(new LFloat2(55 + i * 10, 55 + j * 10));
+                    goals.Add(new LFloat2(-75, -75));
 
-                    Simulator.Instance.addAgent(new Vector2(-55.0f - i * 10.0f, 55.0f + j * 10.0f));
-                    goals.Add(new Vector2(75.0f, -75.0f));
+                    Simulator.Instance.addAgent(new LFloat2(-55 - i * 10, 55 + j * 10));
+                    goals.Add(new LFloat2(75, -75));
 
-                    Simulator.Instance.addAgent(new Vector2(55.0f + i * 10.0f, -55.0f - j * 10.0f));
-                    goals.Add(new Vector2(-75.0f, 75.0f));
+                    Simulator.Instance.addAgent(new LFloat2(55+ i * 10, -55 - j * 10));
+                    goals.Add(new LFloat2(-75, 75));
 
-                    Simulator.Instance.addAgent(new Vector2(-55.0f - i * 10.0f, -55.0f - j * 10.0f));
-                    goals.Add(new Vector2(75.0f, 75.0f));
+                    Simulator.Instance.addAgent(new LFloat2(-55 - i * 10, -55 - j * 10));
+                    goals.Add(new LFloat2(75, 75));
                 }
             }
 
@@ -101,32 +103,32 @@ namespace RVO
              * Add (polygonal) obstacles, specifying their vertices in
              * counterclockwise order.
              */
-            IList<Vector2> obstacle1 = new List<Vector2>();
-            obstacle1.Add(new Vector2(-10.0f, 40.0f));
-            obstacle1.Add(new Vector2(-40.0f, 40.0f));
-            obstacle1.Add(new Vector2(-40.0f, 10.0f));
-            obstacle1.Add(new Vector2(-10.0f, 10.0f));
+            IList<LFloat2> obstacle1 = new List<LFloat2>();
+            obstacle1.Add(new LFloat2(-10, 40));
+            obstacle1.Add(new LFloat2(-40, 40));
+            obstacle1.Add(new LFloat2(-40, 10));
+            obstacle1.Add(new LFloat2(-10, 10));
             Simulator.Instance.addObstacle(obstacle1);
 
-            IList<Vector2> obstacle2 = new List<Vector2>();
-            obstacle2.Add(new Vector2(10.0f, 40.0f));
-            obstacle2.Add(new Vector2(10.0f, 10.0f));
-            obstacle2.Add(new Vector2(40.0f, 10.0f));
-            obstacle2.Add(new Vector2(40.0f, 40.0f));
+            IList<LFloat2> obstacle2 = new List<LFloat2>();
+            obstacle2.Add(new LFloat2(10, 40));
+            obstacle2.Add(new LFloat2(10, 10));
+            obstacle2.Add(new LFloat2(40, 10));
+            obstacle2.Add(new LFloat2(40, 40));
             Simulator.Instance.addObstacle(obstacle2);
 
-            IList<Vector2> obstacle3 = new List<Vector2>();
-            obstacle3.Add(new Vector2(10.0f, -40.0f));
-            obstacle3.Add(new Vector2(40.0f, -40.0f));
-            obstacle3.Add(new Vector2(40.0f, -10.0f));
-            obstacle3.Add(new Vector2(10.0f, -10.0f));
+            IList<LFloat2> obstacle3 = new List<LFloat2>();
+            obstacle3.Add(new LFloat2(10, -40));
+            obstacle3.Add(new LFloat2(40, -40));
+            obstacle3.Add(new LFloat2(40, -10));
+            obstacle3.Add(new LFloat2(10, -10));
             Simulator.Instance.addObstacle(obstacle3);
 
-            IList<Vector2> obstacle4 = new List<Vector2>();
-            obstacle4.Add(new Vector2(-10.0f, -40.0f));
-            obstacle4.Add(new Vector2(-10.0f, -10.0f));
-            obstacle4.Add(new Vector2(-40.0f, -10.0f));
-            obstacle4.Add(new Vector2(-40.0f, -40.0f));
+            IList<LFloat2> obstacle4 = new List<LFloat2>();
+            obstacle4.Add(new LFloat2(-10, -40));
+            obstacle4.Add(new LFloat2(-10, -10));
+            obstacle4.Add(new LFloat2(-40, -10));
+            obstacle4.Add(new LFloat2(-40, -40));
             Simulator.Instance.addObstacle(obstacle4);
 
             /*
@@ -136,7 +138,7 @@ namespace RVO
             Simulator.Instance.processObstacles();
         }
 
-        #if RVO_OUTPUT_TIME_AND_POSITIONS
+#if RVO_OUTPUT_TIME_AND_POSITIONS
         void updateVisualization()
         {
             /* Output the current global time. */
@@ -150,7 +152,7 @@ namespace RVO
 
             Console.WriteLine();
         }
-        #endif
+#endif
 
         void setPreferredVelocities()
         {
@@ -160,9 +162,9 @@ namespace RVO
              */
             for (int i = 0; i < Simulator.Instance.getNumAgents(); ++i)
             {
-                Vector2 goalVector = goals[i] - Simulator.Instance.getAgentPosition(i);
+                LFloat2 goalVector = goals[i] - Simulator.Instance.getAgentPosition(i);
 
-                if (RVOMath.absSq(goalVector) > 1.0f)
+                if (RVOMath.absSq(goalVector) > LFloat.one)
                 {
                     goalVector = RVOMath.normalize(goalVector);
                 }
@@ -170,11 +172,11 @@ namespace RVO
                 Simulator.Instance.setAgentPrefVelocity(i, goalVector);
 
                 /* Perturb a little to avoid deadlocks due to perfect symmetry. */
-                float angle = (float)random.NextDouble() * 2.0f * (float)Math.PI;
-                float dist = (float)random.NextDouble() * 0.0001f;
+                LFloat angle = new LFloat(random.NextInt()) * new LFloat(2) * LMath.PI;
+                LFloat dist = new LFloat(random.NextInt()) * LFloat.EPSILON;
 
                 Simulator.Instance.setAgentPrefVelocity(i, Simulator.Instance.getAgentPrefVelocity(i) +
-                    dist * new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)));
+                    dist * new LFloat2(LMath.Cos(angle), LMath.Sin(angle)));
             }
         }
 
@@ -183,7 +185,7 @@ namespace RVO
             /* Check if all agents have reached their goals. */
             for (int i = 0; i < Simulator.Instance.getNumAgents(); ++i)
             {
-                if (RVOMath.absSq(Simulator.Instance.getAgentPosition(i) - goals[i]) > 400.0f)
+                if (RVOMath.absSq(Simulator.Instance.getAgentPosition(i) - goals[i]) > 400)
                 {
                     return false;
                 }
@@ -202,9 +204,9 @@ namespace RVO
             /* Perform (and manipulate) the simulation. */
             do
             {
-                #if RVO_OUTPUT_TIME_AND_POSITIONS
+#if RVO_OUTPUT_TIME_AND_POSITIONS
                 blocks.updateVisualization();
-                #endif
+#endif
                 blocks.setPreferredVelocities();
                 Simulator.Instance.doStep();
             }

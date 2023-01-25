@@ -31,6 +31,7 @@
  */
 
 using System;
+using Lockstep.Math;
 
 namespace RVO
 {
@@ -43,7 +44,7 @@ namespace RVO
         /**
          * <summary>A sufficiently small positive number.</summary>
          */
-        internal const float RVO_EPSILON = 0.00001f;
+        internal static readonly LFloat RVO_EPSILON = LFloat.EPSILON;
 
         /**
          * <summary>Computes the length of a specified two-dimensional vector.
@@ -53,7 +54,7 @@ namespace RVO
          * computed.</param>
          * <returns>The length of the two-dimensional vector.</returns>
          */
-        public static float abs(Vector2 vector)
+        public static LFloat abs(LFloat2 vector)
         {
             return sqrt(absSq(vector));
         }
@@ -67,9 +68,9 @@ namespace RVO
          * <param name="vector">The two-dimensional vector whose squared length
          * is to be computed.</param>
          */
-        public static float absSq(Vector2 vector)
+        public static LFloat absSq(LFloat2 vector)
         {
-            return vector * vector;
+            return LMath.LengthSq(vector);
         }
 
         /**
@@ -81,7 +82,7 @@ namespace RVO
          * <param name="vector">The two-dimensional vector whose normalization
          * is to be computed.</param>
          */
-        public static Vector2 normalize(Vector2 vector)
+        public static LFloat2 normalize(LFloat2 vector)
         {
             return vector / abs(vector);
         }
@@ -99,9 +100,9 @@ namespace RVO
          * <param name="vector2">The bottom row of the two-dimensional square
          * matrix.</param>
          */
-        internal static float det(Vector2 vector1, Vector2 vector2)
+        internal static LFloat det(LFloat2 vector1, LFloat2 vector2)
         {
-            return vector1.x_ * vector2.y_ - vector1.y_ * vector2.x_;
+            return (vector1.x * vector2.y) - (vector1.y * vector2.x);
         }
 
         /**
@@ -117,16 +118,16 @@ namespace RVO
          * <param name="vector3">The point to which the squared distance is to
          * be calculated.</param>
          */
-        internal static float distSqPointLineSegment(Vector2 vector1, Vector2 vector2, Vector2 vector3)
+        internal static LFloat distSqPointLineSegment(LFloat2 vector1, LFloat2 vector2, LFloat2 vector3)
         {
-            float r = ((vector3 - vector1) * (vector2 - vector1)) / absSq(vector2 - vector1);
+            LFloat r = LMath.Dot(vector3 - vector1, vector2 - vector1) / absSq(vector2 - vector1);
 
-            if (r < 0.0f)
+            if (r < 0)
             {
                 return absSq(vector3 - vector1);
             }
 
-            if (r > 1.0f)
+            if (r > LFloat.one)
             {
                 return absSq(vector3 - vector2);
             }
@@ -142,9 +143,9 @@ namespace RVO
          * <param name="scalar">The float of which to compute the absolute
          * value.</param>
          */
-        internal static float fabs(float scalar)
+        internal static LFloat fabs(LFloat scalar)
         {
-            return Math.Abs(scalar);
+            return LMath.Abs(scalar);
         }
 
         /**
@@ -159,7 +160,7 @@ namespace RVO
          * <param name="c">The point to which the signed distance is to be
          * calculated.</param>
          */
-        internal static float leftOf(Vector2 a, Vector2 b, Vector2 c)
+        internal static LFloat leftOf(LFloat2 a, LFloat2 b, LFloat2 c)
         {
             return det(a - c, b - a);
         }
@@ -171,7 +172,7 @@ namespace RVO
          *
          * <param name="scalar">The float to be squared.</param>
          */
-        internal static float sqr(float scalar)
+        internal static LFloat sqr(LFloat scalar)
         {
             return scalar * scalar;
         }
@@ -184,9 +185,9 @@ namespace RVO
          * <param name="scalar">The float of which to compute the square root.
          * </param>
          */
-        internal static float sqrt(float scalar)
+        internal static LFloat sqrt(LFloat scalar)
         {
-            return (float)Math.Sqrt(scalar);
+            return LMath.Sqrt(scalar);
         }
     }
 }

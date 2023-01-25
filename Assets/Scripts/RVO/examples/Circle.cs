@@ -40,29 +40,30 @@
 
 using System;
 using System.Collections.Generic;
+using Lockstep.Math;
 
 namespace RVO
 {
     class Circle
     {
         /* Store the goals of the agents. */
-        IList<Vector2> goals;
+        IList<LFloat2> goals;
 
         Circle()
         {
-            goals = new List<Vector2>();
+            goals = new List<LFloat2>();
         }
 
         void setupScenario()
         {
             /* Specify the global time step of the simulation. */
-            Simulator.Instance.setTimeStep(0.25f);
+            Simulator.Instance.setTimeStep(new LFloat(true, 250));
 
             /*
              * Specify the default parameters for agents that are subsequently
              * added.
              */
-            Simulator.Instance.setAgentDefaults(15.0f, 10, 10.0f, 10.0f, 1.5f, 2.0f, new Vector2(0.0f, 0.0f));
+            Simulator.Instance.setAgentDefaults(new LFloat(15), 10, new LFloat(10), new LFloat(10), new LFloat(true, 1500), new LFloat(2), LFloat2.zero);
 
             /*
              * Add agents, specifying their start position, and store their
@@ -70,14 +71,14 @@ namespace RVO
              */
             for (int i = 0; i < 250; ++i)
             {
-                Simulator.Instance.addAgent(200.0f *
-                    new Vector2((float)Math.Cos(i * 2.0f * Math.PI / 250.0f),
+                Simulator.Instance.addAgent(200 *
+                    new LFloat2(true, (float)Math.Cos(i * 2.0f * Math.PI / 250.0f),
                         (float)Math.Sin(i * 2.0f * Math.PI / 250.0f)));
                 goals.Add(-Simulator.Instance.getAgentPosition(i));
             }
         }
 
-        #if RVO_OUTPUT_TIME_AND_POSITIONS
+#if RVO_OUTPUT_TIME_AND_POSITIONS
         void updateVisualization()
         {
             /* Output the current global time. */
@@ -91,7 +92,7 @@ namespace RVO
 
             Console.WriteLine();
         }
-        #endif
+#endif
 
         void setPreferredVelocities()
         {
@@ -101,9 +102,9 @@ namespace RVO
              */
             for (int i = 0; i < Simulator.Instance.getNumAgents(); ++i)
             {
-                Vector2 goalVector = goals[i] - Simulator.Instance.getAgentPosition(i);
+                LFloat2 goalVector = goals[i] - Simulator.Instance.getAgentPosition(i);
 
-                if (RVOMath.absSq(goalVector) > 1.0f)
+                if (RVOMath.absSq(goalVector) > LFloat.one)
                 {
                     goalVector = RVOMath.normalize(goalVector);
                 }
@@ -135,9 +136,9 @@ namespace RVO
             /* Perform (and manipulate) the simulation. */
             do
             {
-                #if RVO_OUTPUT_TIME_AND_POSITIONS
+#if RVO_OUTPUT_TIME_AND_POSITIONS
                 circle.updateVisualization();
-                #endif
+#endif
                 circle.setPreferredVelocities();
                 Simulator.Instance.doStep();
             }
